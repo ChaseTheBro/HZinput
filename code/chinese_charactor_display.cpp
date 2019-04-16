@@ -8,8 +8,13 @@
 
 using namespace std;
 
+//realize four types of display mode using four different parameters
 void display_hz(char mat[16][2], int italy = 0, int scale = 1, bool convert = false, bool mirror = false);
+
+//find all possible related chinese charater due to the input pingying
 void find_hz(string &input, map<string, string> &pingying, FILE *zkfile, FILE *zbfile);
+
+//let the user to select display mode
 void select_display_mode(char mat[16][2]);
 
 int main()
@@ -42,6 +47,7 @@ int main()
                 break;
             find_hz(input, pingying, zkfile, zbfile);
         }else{
+            //The mode of english display directely check the charactor in the zbHzk
             unsigned char charactor;
             cout << "Input a charactor(input \"exit\" to quit)" << endl << ">>>";
             cin >> input;
@@ -49,6 +55,7 @@ int main()
                 break;
             charactor = input[0];
             char mat[16][2];
+            //The offset is charater * 32 because one charator has 32 byte
             unsigned long offset = charactor * 32;
             fseek(zbfile, offset, SEEK_SET);
             fread(mat, 32, 1, zbfile);
@@ -83,17 +90,23 @@ void find_hz(string &input, map<string, string> &pingying, FILE *zkfile, FILE *z
 
     char mat[16][2];
     memset(mat, 0x00, sizeof(32));
+    //use unsigned char type because the type has exactly 1 byte it won't take
+    //unnessasary information
     unsigned char qh = temp_result[choice][0] - 0xa1;
     unsigned char wh = temp_result[choice][1] - 0xa1;
+    //due to users selection find the HZ in different library
     if(code == 1){
+        //in GB library
         unsigned long offset = (94 * qh + wh) * 32;
         fseek(zkfile, offset, SEEK_SET);
         fread(mat, 32, 1, zkfile);
     }else{
+        //in ZB library
         unsigned long offset = (94 * qh + wh + 256) * 32;
         fseek(zbfile, offset, SEEK_SET);
         fread(mat, 32, 1, zbfile);
     }
+    //as we have the matrix information give it to select function
     select_display_mode(mat);
     cout << "\n";
 }
@@ -102,24 +115,36 @@ void display_hz(char mat[16][2], int italy, int scale, bool convert, bool mirror
 {
     string content;
     string space;
+    //due to the scale mode user choose output different string
     for(int s = 0; s < scale; s++){
         content.append("**");
         space.append("  ");
     }
+    //travel the matrix to out put the charater
     for(int j = 0; j < 16; j++){
+        //the scale control
         for(int s = 0; s < scale; s++){
+            //italy style control
             for(int p = 0; p < (16 - j) * italy; p++)
                 cout << " ";
+            //The charator
             for(int i = 0;i < 2; i++){
                 for(int k = 0; k < 8; k++){
+                    //due to different mode make different output
+
+                    //convert
                     if(convert && !mirror && (mat[15 - j][i] & (0x80 >> k)))
                         cout << content;
+                    //normal
                     else if(!convert && !mirror &&(mat[j][i] & (0x80 >> k)))
                         cout << content;
+                    //mirror
                     else if(!convert && mirror && (mat[j][1 - i] & (0x80 >> (7 - k))))
                         cout << content;
+                    //convert and mirror
                     else if(convert && mirror && (mat[15 - j][1 - i] & (0x80 >> (7 - k))))
                         cout << content;
+                    //no content output space
                     else
                         cout << space;
                 }
@@ -137,29 +162,34 @@ void select_display_mode(char mat[16][2])
     bool convert = false;
     bool mirror = false;
     cout << endl;
+    //choose whether to be italy style
     cout << "italy style?(Y/n)" << endl << ">>>";
     cin >> input;
     if(input == 'y' || input == 'Y'){
         cout << "slop degree?(1-3 recommended)" << endl << ">>>";
         cin >> italy;
     }
+    //choose whether to be scale
     cout << "Scale?(Y/n)" << endl << ">>>";
     cin >> input;
     if(input == 'y' || input == 'Y'){
         cout << "scale times?(1-3 recommended)" << endl << ">>>";
         cin >> scale;
     }
+    //choose whether to scale
     cout << "Convert?(Y/n)" << endl << ">>>";
     cin >> input;
     if(input == 'y' || input == 'Y'){
         convert = true;
     }
+    //choose whether to mirror
     cout << "Mirror?(Y/n)" << endl << ">>>";
     cin >> input;
     if(input == 'y' || input == 'Y'){
         mirror = true;
     }
     cout << endl;
+    //due to the selection make display
     display_hz(mat, italy, scale, convert, mirror);
     cout << endl;
 }
