@@ -40,7 +40,7 @@ int main()
     while(true){
         cout << "English or pingying(E-English P-pingying)" << endl << ">>>";
         cin >> choice;
-        if(choice == 'P' && choice == 'p'){
+        if(choice == 'P' || choice == 'p'){
             cout << "Input pingying(input \"exit\" to quit)" << endl << ">>>";
             cin >> input;
             if(input == "exit")

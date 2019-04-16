@@ -4,7 +4,7 @@
 
 ## 编译方法
 
-在macOS或者Linux环境下，在`code`文件夹下，直接执行`make`指令编译源代码，输入指令`./cndp`执行程序。
+在macOS或者Linux环境下，在`code`文件夹下，直接执行`make`指令编译源代码，输入指令`./cndp`执行程序。执行`make clean`清除编译产生的文件。
 
 在Windows环境下，手动编译执行源代码文件`chinese_character_display.cpp`，之后执行可执行文件。
 
